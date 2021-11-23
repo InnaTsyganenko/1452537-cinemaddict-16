@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Inna Tsyganenko](https://up.htmlacademy.ru/ecmascript/16/user/1452537).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Пасунько](https://htmlacademy.ru/profile/id702351).
 
 ---
 
