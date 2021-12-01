@@ -4,11 +4,11 @@ module.exports = {
   entry: './src/main.js',
   devtool: 'source-map',
   output: {
-    filename: 'bundle.js',
+    filename: 'js/bundle.js',
     path: path.resolve(__dirname, 'public/js'),
   },
   devServer: {
-    hot: false
+    hot: false,
   },
   module: {
     rules: [
