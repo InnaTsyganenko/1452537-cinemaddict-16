@@ -101,8 +101,8 @@ const generateMovieReleaseCountry = () => {
 };
 
 export const generateMovie = () => {
-  const isInWatchlist = Boolean(getRandomInteger(0, 1));
-  const watchingDate = isInWatchlist
+  const isAlreadyWatched = Boolean(getRandomInteger(0, 1));
+  const watchingDate = isAlreadyWatched
     ? dayjs().subtract(getRandomInteger(0, 5000), 'day')
     : null;
 
@@ -127,8 +127,8 @@ export const generateMovie = () => {
       description: getRandomArrayElements(TEXT, 1),
     },
     userDetails: {
-      isInWatchlist,
-      isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
+      isInWatchlist: Boolean(getRandomInteger(0, 1)),
+      isAlreadyWatched,
       watchingDate,
       isInFavorite: Boolean(getRandomInteger(0, 1)),
     },
