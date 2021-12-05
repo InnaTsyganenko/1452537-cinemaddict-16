@@ -60,7 +60,6 @@ const renderPopup = (movie) => {
 const renderMovieCard = function(place, movie) {
   const movieCardComponent = new MovieCardView(movie).element;
 
-
   render(place, movieCardComponent, RenderPosition.BEFOREEND);
 
   const moviesCardLinkElement = movieCardComponent.querySelector('.film-card__link');
