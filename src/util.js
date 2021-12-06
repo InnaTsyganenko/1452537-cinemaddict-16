@@ -26,3 +26,7 @@ export const getRandomArrayElements = function (arr, minValue) {
   }
   return (shuffledArr.slice(min));
 };
+
+export const isEscEvent = function(evt) {
+  return evt.key === ('Escape' || 'Esc');
+};

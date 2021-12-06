@@ -1,4 +1,6 @@
-export const createFilterAndStatsTemplate = (movies) => {
+import {createElement} from '../render.js';
+
+const createFilterAndStatsTemplate = (movies) => {
 
   const isInWatchlist = movies.filter((movie) => movie.userDetails.isInWatchlist).length;
   const isAlreadyWatched = movies.filter((movie) => movie.userDetails.isAlreadyWatched).length;
@@ -14,3 +16,28 @@ export const createFilterAndStatsTemplate = (movies) => {
     <a href="#stats" class="main-navigation__additional">Stats</a>
   </nav>`;
 };
+
+export default class FilterAndStatsView {
+  #element = null;
+  #movies = null;
+
+  constructor(movies) {
+    this.#movies = movies;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFilterAndStatsTemplate(this.#movies);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

@@ -1,14 +1,14 @@
-export const createMovieCardControlsTemplate = (movie) => {
+export const createMovieCardControlsTemplate = (userDetails) => {
 
-  const watchlistClassActive = movie.isInWatchlist
+  const watchlistClassActive = userDetails.isInWatchlist
     ? 'film-card__controls-item--active'
     : '';
 
-  const alreadyWatchedClassActive = movie.isAlreadyWatched
+  const alreadyWatchedClassActive = userDetails.isAlreadyWatched
     ? 'film-card__controls-item--active'
     : '';
 
-  const favoriteClassActive = movie.isInFavorite
+  const favoriteClassActive = userDetails.isInFavorite
     ? 'film-card__controls-item--active'
     : '';
 

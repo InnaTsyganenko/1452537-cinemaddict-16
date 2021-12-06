@@ -124,7 +124,7 @@ export const generateMovie = () => {
       },
       runtime: getRandomInteger(2, 200),
       genres: generateMovieGenres(),
-      description: getRandomArrayElements(TEXT, 1),
+      description: getRandomArrayElements(TEXT, 1).join(''),
     },
     userDetails: {
       isInWatchlist: Boolean(getRandomInteger(0, 1)),

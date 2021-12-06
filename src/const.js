@@ -15,3 +15,4 @@ export const TEXT = [
   'In rutrum ac purus sit amet tempus.',
 ];
 export const USER_RANK = ['Novice', 'Fan', 'Movie Buff'];
+export const TITLES_FOR_EXTRA_BLOCKS = ['Top rated', 'Most commented'];

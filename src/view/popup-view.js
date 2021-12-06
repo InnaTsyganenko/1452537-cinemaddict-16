@@ -1,8 +1,9 @@
 import {formatRunTime} from '../render';
 import {createPopupGenresTemplate} from './popup-genres-view';
 import {createPopupCommentsListTemplate} from './popup-comments-view';
+import {createElement} from '../render.js';
 
-export const createPopupTemplate = (movie) => {
+const createPopupTemplate = (movie) => {
   const {filmInfo} = movie;
 
   return `<section class="film-details">
@@ -116,3 +117,28 @@ export const createPopupTemplate = (movie) => {
     </form>
   </section>`;
 };
+
+export default class PopupView {
+  #element = null;
+  #movie = null;
+
+  constructor(movie) {
+    this.#movie = movie;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createPopupTemplate(this.#movie);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
