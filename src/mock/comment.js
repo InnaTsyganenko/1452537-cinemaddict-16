@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
-import {getRandomInteger, getRandomArrayElements} from '../util';
+import {getRandomInteger, getRandomArrayElements} from '../utils/common';
 import {EMOTIONS, TEXT} from '../const';
 
 const generateCommentAuthor = () => {

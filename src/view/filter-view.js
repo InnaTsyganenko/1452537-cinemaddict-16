@@ -1,4 +1,4 @@
-import {capitalizeFirstLetter} from '../util';
+import {capitalizeFirstLetter} from '../utils/common';
 import {FILTERS_VALUES} from '../const';
 
 export const createFilterTemplate = (movies, isActive) => {

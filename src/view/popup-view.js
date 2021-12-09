@@ -1,7 +1,7 @@
-import {formatRunTime} from '../render';
+import AbstractView from './abstract-view.js';
+import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
 import {createPopupCommentsListTemplate} from './popup-comments-view';
-import {createElement} from '../render.js';
 
 const createPopupTemplate = (movie) => {
   const {filmInfo} = movie;
@@ -118,27 +118,25 @@ const createPopupTemplate = (movie) => {
   </section>`;
 };
 
-export default class PopupView {
-  #element = null;
+export default class PopupView extends AbstractView {
   #movie = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createPopupTemplate(this.#movie);
   }
 
-  removeElement() {
-    this.#element = null;
+  setClickCloseHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }
