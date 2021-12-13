@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
-import {getRandomInteger, getRandomArrayElements, getRandomArbitrary} from '../util';
+import {getRandomInteger, getRandomArrayElements, getRandomArbitrary} from '../utils/common';
 import {generateComment} from '../mock/comment';
 import {TEXT} from '../const';
 

@@ -1,6 +1,6 @@
-import {formatRunTime} from '../render';
+import AbstractView from './abstract-view.js';
+import {formatRunTime} from '../utils/movie';
 import {createMovieCardControlsTemplate} from './movie-card-controls-view';
-import {createElement} from '../render.js';
 
 const createMovieCardTemplate = (movie) => `<article class="film-card">
     <a class="film-card__link">
@@ -21,27 +21,25 @@ const createMovieCardTemplate = (movie) => `<article class="film-card">
     ${createMovieCardControlsTemplate(movie.userDetails)}
   </article>`;
 
-export default class MovieCardView {
-  #element = null;
+export default class MovieCardView extends AbstractView {
   #movie = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createMovieCardTemplate(this.#movie);
   }
 
-  removeElement() {
-    this.#element = null;
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
+  }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }

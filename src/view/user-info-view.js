@@ -1,6 +1,6 @@
+import AbstractView from './abstract-view.js';
 import {USER_RANK} from '../const';
-import {getRandomInteger} from '../util';
-import {createElement} from '../render.js';
+import {getRandomInteger} from '../utils/common';
 
 const createUserInfoTemplate = () => (
   `<section class="header__profile profile">
@@ -11,22 +11,8 @@ const createUserInfoTemplate = () => (
   </section>`
 );
 
-export default class UserInfoView {
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
+export default class UserInfoView extends AbstractView {
   get template() {
     return createUserInfoTemplate();
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
