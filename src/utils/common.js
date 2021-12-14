@@ -27,10 +27,6 @@ export const getRandomArrayElements = function (arr, minValue) {
   return (shuffledArr.slice(min));
 };
 
-export const isEscEvent = function(evt) {
-  return evt.key === ('Escape' || 'Esc');
-};
-
 export const capitalizeFirstLetter = function(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };

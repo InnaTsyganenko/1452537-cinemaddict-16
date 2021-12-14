@@ -1,4 +1,4 @@
-export const MOVIE_COUNT = 18;
+export const MOVIE_COUNT = 8;
 export const MOVIE_COUNT_PER_STEP = 5;
 export const EMOTIONS = ['angry', 'puke', 'sleeping', 'smile'];
 export const TEXT = [
