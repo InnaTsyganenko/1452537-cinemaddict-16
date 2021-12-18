@@ -1,6 +1,6 @@
 import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
-import {render, RenderPosition, remove, replace} from '../utils/render';
+import {render,  RenderPosition, remove, replace} from '../utils/render';
 
 export default class MoviePresenter {
   #moviesContainer = null;

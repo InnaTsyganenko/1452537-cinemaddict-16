@@ -1,13 +1,10 @@
 
 import UserInfoView from './view/user-info-view';
-
-import MainNavView from './view/main-nav-view';
-import SortView from './view/sort-view';
 import MoviesSectionPresenter from './presenter/movies-section-presenter';
-import NumberOfFilmsView from './view/number-of-films-view';
-import {MOVIE_COUNT, FILTERS_VALUES} from './const';
+
+import {MOVIE_COUNT} from './const';
 import {generateMovie} from './mock/movie';
-import {render,  RenderPosition} from './utils/render';
+import {render, RenderPosition} from './utils/render';
 
 const movies = Array.from({length: MOVIE_COUNT}, generateMovie);
 
@@ -16,13 +13,6 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 
 render(siteHeaderElement, new UserInfoView(), RenderPosition.BEFOREEND);
-render(siteMainElement, new MainNavView(movies, FILTERS_VALUES[0]), RenderPosition.AFTERBEGIN);
-
-render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
-
-const moviesSectionPresenter = new MoviesSectionPresenter(siteMainElement);
-
-moviesSectionPresenter.init(movies);
 
 const moviesSectionPresenter = new MoviesSectionPresenter(siteMainElement, siteFooterElement);
 moviesSectionPresenter.init(movies);
