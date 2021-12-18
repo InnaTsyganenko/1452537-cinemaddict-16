@@ -1,4 +1,4 @@
-export const MOVIE_COUNT = 18;
+export const MOVIE_COUNT = 8;
 export const MOVIE_COUNT_PER_STEP = 5;
 export const EMOTIONS = ['angry', 'puke', 'sleeping', 'smile'];
 export const TEXT = [
@@ -17,3 +17,16 @@ export const TEXT = [
 export const USER_RANK = ['Novice', 'Fan', 'Movie Buff'];
 export const TITLES_FOR_EXTRA_BLOCKS = ['Top rated', 'Most commented'];
 export const FILTERS_VALUES = ['all', 'watchlist', 'history', 'favorites'];
+
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+};
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};

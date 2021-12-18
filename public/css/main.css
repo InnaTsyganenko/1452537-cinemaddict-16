@@ -354,6 +354,7 @@ button {
 }
 
 .film-card__link:hover {
+  cursor: pointer;
   opacity: 1;
 }
 
