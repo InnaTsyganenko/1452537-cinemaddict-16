@@ -1,20 +1,7 @@
 import AbstractView from './abstract-view.js';
 import {formatRunTime} from '../utils/movie';
 
-const createMovieCardTemplate = (movie) => {
-  const watchlistClassActive = movie.userDetails.isInWatchlist
-    ? '--active'
-    : '';
-
-  const alreadyWatchedClassActive = movie.userDetails.isAlreadyWatched
-    ? '--active'
-    : '';
-
-  const favoriteClassActive = movie.userDetails.isInFavorite
-    ? '--active'
-    : '';
-
-  return`<article class="film-card" id=${movie.id}>
+const createMovieCardTemplate = (movie) => `<article class="film-card" id=${movie.id}>
     <a class="film-card__link">
       <h3 class="film-card__title">${movie.filmInfo.title}</h3>
       <p class="film-card__rating">${movie.filmInfo.totalRating}</p>
@@ -61,7 +48,6 @@ export default class MovieCardView extends AbstractView {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#movieWatchlistClickHandler);
   }
-
 
   setMovieWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
