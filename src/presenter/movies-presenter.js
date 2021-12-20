@@ -48,7 +48,7 @@ export default class MoviePresenter {
       replace(this.#movieCardComponent, prevMovieCardComponent);
     }
 
-    if (this.#popupComponent !== prevPopupComponent) {
+    if (prevPopupComponent.element.parentElement !== null && this.#popupComponent !== prevPopupComponent) {
       replace(this.#popupComponent, prevPopupComponent);
     }
     remove(prevMovieCardComponent);
