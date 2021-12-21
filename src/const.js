@@ -1,6 +1,6 @@
-export const MOVIE_COUNT = 18;
+export const MOVIE_COUNT = 8;
 export const MOVIE_COUNT_PER_STEP = 5;
-export const EMOTIONS = ['angry', 'puke', 'sleeping', 'smile'];
+export const EMOTIONS = ['smile', 'sleeping', 'puke','angry'];
 export const TEXT = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -15,5 +15,17 @@ export const TEXT = [
   'In rutrum ac purus sit amet tempus.',
 ];
 export const USER_RANK = ['Novice', 'Fan', 'Movie Buff'];
-export const TITLES_FOR_EXTRA_BLOCKS = ['Top rated', 'Most commented'];
 export const FILTERS_VALUES = ['all', 'watchlist', 'history', 'favorites'];
+
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+};
+
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
