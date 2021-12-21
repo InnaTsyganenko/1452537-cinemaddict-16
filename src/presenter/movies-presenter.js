@@ -58,7 +58,7 @@ export default class MoviePresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#popupComponent.element.remove();
+      this.#handleClosePopupClick();
     }
   }
 

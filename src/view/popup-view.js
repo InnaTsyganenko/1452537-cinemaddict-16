@@ -1,7 +1,23 @@
-import AbstractView from './abstract-view.js';
+import AbstractView from './abstract-view';
 import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
 import {createPopupCommentsListTemplate} from './popup-comments-view';
+import {EMOTIONS} from '../const';
+
+const createCommentEmotionsTemplate = () => (
+  EMOTIONS.map((emotion) => `<input
+    class="film-details__emoji-item visually-hidden"
+    name="comment-emoji"
+    type="radio"
+    id="emoji-${emotion}"
+    value="${emotion}"
+  />
+  <label
+    class="film-details__emoji-label"
+    for="emoji-${emotion}">
+    <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji-${emotion}">
+  </label>`).join('')
+);
 
 const createPopupTemplate = (movie) => {
   const {filmInfo} = movie;
@@ -123,25 +139,7 @@ const createPopupTemplate = (movie) => {
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-              <label class="film-details__emoji-label" for="emoji-smile">
-                <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-              <label class="film-details__emoji-label" for="emoji-sleeping">
-                <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-              <label class="film-details__emoji-label" for="emoji-puke">
-                <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-              <label class="film-details__emoji-label" for="emoji-angry">
-                <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-              </label>
+              ${createCommentEmotionsTemplate()}
             </div>
           </div>
         </section>
@@ -152,16 +150,14 @@ const createPopupTemplate = (movie) => {
 
 export default class PopupView extends AbstractView {
   #movie = null;
-  #mode = null;
 
-  constructor(movie, mode) {
+  constructor(movie) {
     super();
     this.#movie = movie;
-    this.#mode = mode;
   }
 
   get template() {
-    return createPopupTemplate(this.#movie, this.#mode);
+    return createPopupTemplate(this.#movie);
   }
 
   setClosePopupHandler = (callback) => {
