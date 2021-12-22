@@ -10,8 +10,15 @@ const createSortTemplate = (isActive) => (
 );
 
 export default class SortView extends AbstractView {
+  #isActive = null;
+
+  constructor(isActive) {
+    super();
+    this.#isActive = isActive;
+  }
+
   get template() {
-    return createSortTemplate();
+    return createSortTemplate(this.#isActive);
   }
 
   setSortTypeChangeHandler = (callback) => {
