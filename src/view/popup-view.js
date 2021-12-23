@@ -1,8 +1,18 @@
-import AbstractView from './abstract-view';
+import SmartView from './smart-view.js';
 import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
-import {createPopupCommentsListTemplate} from './popup-comments-view';
 import {EMOTIONS} from '../const';
+import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
+
+
+const NEW_COMMENT = {
+  id: nanoid(),
+  author: '',
+  comment: '',
+  date: dayjs(),
+  emotion: '',
+};
 
 const createCommentEmotionsTemplate = () => (
   EMOTIONS.map((emotion) => `<input
@@ -19,7 +29,21 @@ const createCommentEmotionsTemplate = () => (
   </label>`).join('')
 );
 
-const createPopupTemplate = (movie) => {
+const createPopupCommentsListTemplate = (comments) => comments.sort((a,b) => (b.date - a.date)).map((comment) => `<li class="film-details__comment">
+    <span class="film-details__comment-emoji">
+      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
+    </span>
+    <div>
+      <p class="film-details__comment-text">${comment.comment}</p>
+      <p class="film-details__comment-info">
+        <span class="film-details__comment-author">${comment.author}</span>
+        <span class="film-details__comment-day">${comment.date.format('YYYY/MM/DD HH:MM')}</span>
+        <button class="film-details__comment-delete">Delete</button>
+      </p>
+    </div>
+  </li>`).join('');
+
+const createPopupTemplate = (movie, newComment) => {
   const {filmInfo} = movie;
 
   const watchlistClassActive = movie.userDetails.isInWatchlist
@@ -132,7 +156,11 @@ const createPopupTemplate = (movie) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">
+              ${newComment.emotion !== ''
+    ? `<img src="images/emoji/${newComment.emotion}.png" width="55" height="55" alt="emoji-${newComment.emotion}">`
+    : ''}
+            </div>
 
             <label class="film-details__comment-label">
               <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -148,16 +176,24 @@ const createPopupTemplate = (movie) => {
   </section>`;
 };
 
-export default class PopupView extends AbstractView {
-  #movie = null;
+export default class PopupView extends SmartView {
+  #newComment = null;
 
-  constructor(movie) {
+  constructor(movie, newComment = NEW_COMMENT) {
     super();
-    this.#movie = movie;
+    this.#newComment = newComment;
+
+    this._data = PopupView.parseMovieToData(movie);
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createPopupTemplate(this.#movie);
+    return createPopupTemplate(this._data, this.#newComment);
+  }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
   }
 
   setClosePopupHandler = (callback) => {
@@ -180,6 +216,10 @@ export default class PopupView extends AbstractView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#movieFavoriteClickHandler);
   }
 
+  #setInnerHandlers = () => {
+    this.element.querySelectorAll('.film-details__emoji-item').forEach((emotion) => emotion.addEventListener('click', this.#emotionToggleHandler));
+  }
+
   #closePopupClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
@@ -198,5 +238,24 @@ export default class PopupView extends AbstractView {
   #movieFavoriteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  }
+
+  #emotionToggleHandler = (evt) => {
+    evt.preventDefault();
+    const newComment = this.#newComment;
+    newComment.emotion = evt.target.value;
+    const scrollPosY = document.querySelector('.film-details').scrollTop;
+    this.updateElement();
+    document.querySelector('.film-details').scroll(0, scrollPosY);
+  }
+
+  static parseMovieToData = (movie) => ({...movie});
+
+  static parseDataToMovie = (data) => {
+    const movie = {...data};
+
+    window.scrollTo(0, JSON.parse(localStorage.rememberScroll)[0].scroll);
+
+    return movie;
   }
 }

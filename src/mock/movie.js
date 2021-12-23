@@ -4,7 +4,7 @@ import {getRandomInteger, getRandomArrayElements, getRandomArbitrary} from '../u
 import {generateComment} from '../mock/comment';
 import {TEXT} from '../const';
 
-const COMMENT_COUNT = 30;
+const COMMENT_COUNT = 10;
 
 const comments = Array.from({length: COMMENT_COUNT}, generateComment);
 

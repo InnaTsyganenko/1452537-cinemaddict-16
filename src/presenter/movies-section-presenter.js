@@ -8,15 +8,15 @@ import MoviePresenter from '../presenter/movies-presenter';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import NoMovieView from '../view/no-movies-view';
 import NumberOfFilmsView from '../view/number-of-films-view';
-import {MOVIE_COUNT_PER_STEP, FILTERS_VALUES, FilterType, SortType} from '../const';
+import {MOVIE_COUNT_PER_STEP, FilterType, SortType} from '../const';
 import {render,  RenderPosition, updateItem} from '../utils/render';
 
 export default class MoviesSectionPresenter {
+  #sortComponent = null;
   #mainContainer = null;
   #footerContainer = null;
 
   #mainNavComponent = new MainNavView();
-  #sortComponent = new SortView();
   #moviesSectionComponent = new MoviesSectionView();
   #moviesListComponent = new MoviesListView();
   #moviesListContainerComponent = new MoviesListContainerView();
@@ -51,7 +51,6 @@ export default class MoviesSectionPresenter {
   #handleMovieChange = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
     this.#sourcedMovies = updateItem(this.#sourcedMovies, updatedMovie);
-    // this.#moviesPresenters.forEach((presenter) => presenter.get(updatedMovie.id).init(updatedMovie));
     this.#moviesMainPresenter.get(updatedMovie.id).init(updatedMovie);
   }
 
@@ -59,6 +58,14 @@ export default class MoviesSectionPresenter {
     if (this.#footerContainer.firstElementChild.classList.contains('film-details')) {
       this.#footerContainer.querySelector('.film-details__close-btn').click();
     }
+  }
+
+  #clearFilter = () => {
+    this.#mainNavComponent.element.removeChild(this.#mainNavComponent.element.querySelector('.main-navigation__items'));
+  }
+
+  #clearSort = () => {
+    this.#mainContainer.removeChild(this.#mainContainer.querySelector('.sort'));
   }
 
   #clearMovieList = () => {
@@ -97,6 +104,8 @@ export default class MoviesSectionPresenter {
       this.#footerContainer.querySelector('.film-details__close-btn').click();
     }
     this.#filterMovies(filterType);
+    this.#clearFilter(filterType);
+    this.#renderFilters(this.#mainNavComponent.element, filterType);
     this.#clearMovieList();
     this.#renderMainBlockMovies();
   }
@@ -123,6 +132,8 @@ export default class MoviesSectionPresenter {
     }
     this.#sortMovies(sortType);
     this.#closeOpenedPopup();
+    this.#clearSort();
+    this.#renderSort(sortType);
     this.#clearMovieList();
     this.#renderMainBlockMovies();
   }
@@ -137,16 +148,17 @@ export default class MoviesSectionPresenter {
 
   #renderMainNav = () => {
     render(this.#mainContainer, this.#mainNavComponent, RenderPosition.AFTERBEGIN);
-    this.#renderFilters(this.#mainNavComponent.element);
+    this.#renderFilters(this.#mainNavComponent.element, this.#currentFilterType);
   }
 
-  #renderFilters = (container) => {
-    const filterComponent = new FilterView(this.#sourcedMovies, FILTERS_VALUES[0]);
+  #renderFilters = (container, filterType) => {
+    const filterComponent = new FilterView(this.#sourcedMovies, filterType);
     render(container, filterComponent, RenderPosition.AFTERBEGIN);
     filterComponent.setFilterTypeChangeHandler(this.#handleFilterChange);
   }
 
-  #renderSort = () => {
+  #renderSort = (sortType) => {
+    this.#sortComponent = new SortView(sortType);
     render(this.#moviesSectionComponent, this.#sortComponent, RenderPosition.BEFOREBEGIN);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   }
@@ -181,7 +193,7 @@ export default class MoviesSectionPresenter {
 
   #renderMoviesSection = () => {
     this.#renderMainNav();
-    this.#renderSort();
+    this.#renderSort(this.#currentSortType);
     this.#renderMainBlockMovies();
   }
 }
