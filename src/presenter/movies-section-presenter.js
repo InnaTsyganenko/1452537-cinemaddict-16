@@ -105,8 +105,6 @@ export default class MoviesSectionPresenter {
     }
     this.#filterMovies(filterType);
     this.#closeOpenedPopup();
-    this.#clearFilter(filterType);
-    this.#renderFilters(this.#mainNavComponent.element, filterType);
     this.#clearMovieList();
     this.#renderMainBlockMovies();
   }

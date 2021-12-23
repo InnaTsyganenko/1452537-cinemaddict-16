@@ -9,7 +9,7 @@ const createFilterTemplate = (movies, filters, currentFilterType) => {
   return `<div class="main-navigation__items">
   ${filters.map((filter) => `<a href="#${filter.type}" class="main-navigation__item main-navigation__item${currentFilterType === filter.type ? '--active' : ''}" data-filter-type="${filter.type}">${filter.name}
   ${filter.type !== 'all'
-    ? `<span class="main-navigation__item-count">
+    ? `<span class="main-navigation__item-count" data-filter-type="${filter.type}">
         ${filter.type === FilterType.WATCHLIST ? isInWatchlist : ''}
         ${filter.type === FilterType.HISTORY ? isAlreadyWatched : ''}
         ${filter.type === FilterType.FAVORITES ? isInFavorite : ''}
@@ -35,7 +35,7 @@ export default class FilterView extends AbstractView {
 
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+    this.element.querySelectorAll('.main-navigation__item').forEach((link) => link.addEventListener('click', this.#filterTypeChangeHandler));
   }
 
   #getFilters = () => [
@@ -61,7 +61,7 @@ export default class FilterView extends AbstractView {
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.dataset.filterType);
 
-    [].forEach.call(this.element.querySelectorAll('.sort__button--active'), (item) => item.classList.remove('sort__button--active'));
-    evt.target.classList.add('sort__button--active');
+    [].forEach.call(this.element.querySelectorAll('.main-navigation__item--active'), (item) => item.classList.remove('main-navigation__item--active'));
+    evt.target.classList.add('main-navigation__item--active');
   }
 }
