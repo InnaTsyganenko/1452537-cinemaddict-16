@@ -63,6 +63,7 @@ export default class MoviePresenter {
   }
 
   #handleClosePopupClick = () => {
+    this.#popupComponent.reset();
     this.#popupComponent.element.remove();
     document.querySelector('body').classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);

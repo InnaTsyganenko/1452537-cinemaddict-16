@@ -1,18 +1,25 @@
 import AbstractView from './abstract-view.js';
 import {formatRunTime} from '../utils/movie';
+import {CONTROLS_BUTTON} from '../const';
+
+const createPopupControlsTemplate = (movie) => (
+  CONTROLS_BUTTON.map((control) => `<button
+    class="film-card__controls-item
+    ${control === 'watchlist' ? `film-card__controls-item--add-to-${control}` : ''}
+    ${control === 'watchlist' && movie.userDetails.isInWatchlist ? 'film-card__controls-item--active' : ''}
+    ${control === 'watched' ? `film-card__controls-item--mark-as-${control}` : ''}
+    ${control === 'watched' && movie.userDetails.isAlreadyWatched ? 'film-card__controls-item--active' : ''}
+    ${control === 'favorite' ? `film-card__controls-item--${control}` : ''}
+    ${control === 'favorite' && movie.userDetails.isInFavorite ? 'film-card__controls-item--active' : ''}"
+    type="button">
+    ${control === 'watchlist' ? `Add to ${control}` : ''}
+    ${control === 'watched' ? `Mark as ${control}` : ''}
+    ${control === 'favorite' ? `Mark as ${control}` : ''}
+  </button>`).join('')
+);
 
 const createMovieCardTemplate = (movie) => {
-  const watchlistClassActive = movie.userDetails.isInWatchlist
-    ? '--active'
-    : '';
-
-  const alreadyWatchedClassActive = movie.userDetails.isAlreadyWatched
-    ? '--active'
-    : '';
-
-  const favoriteClassActive = movie.userDetails.isInFavorite
-    ? '--active'
-    : '';
+  const controlsTemplate = createPopupControlsTemplate(movie);
 
   return`<article class="film-card" id=${movie.id}>
     <a class="film-card__link">
@@ -31,12 +38,8 @@ const createMovieCardTemplate = (movie) => {
       <span class="film-card__comments">${movie.comments.length === 0 ? 'No' : movie.comments.length} comments</span>
     </a>
     <div class="film-card__controls">
-        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist film-card__controls-item${watchlistClassActive}" type="button">Add to watchlist</button>
-
-        <button class="film-card__controls-item film-card__controls-item--mark-as-watched film-card__controls-item${alreadyWatchedClassActive}" type="button">Mark as watched</button>
-
-        <button class="film-card__controls-item film-card__controls-item--favorite film-card__controls-item${favoriteClassActive}" type="button">Mark as favorite</button>
-      </div>
+        ${controlsTemplate}
+    </div>
   </article>`;
 };
 

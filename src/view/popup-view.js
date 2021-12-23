@@ -1,7 +1,7 @@
 import SmartView from './smart-view.js';
 import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
-import {EMOTIONS} from '../const';
+import {EMOTIONS, CONTROLS_BUTTON} from '../const';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 
@@ -43,20 +43,22 @@ const createPopupCommentsListTemplate = (comments) => comments.sort((a,b) => (b.
     </div>
   </li>`).join('');
 
+const createPopupControlsTemplate = (movie) => (
+  CONTROLS_BUTTON.map((control) => `<button
+    type="button"
+    class="film-details__control-button film-details__control-button--${control} film-details__control-button${control === 'watchlist' && movie.userDetails.isInWatchlist ? '--active' : ''}${control === 'watched' && movie.userDetails.isAlreadyWatched ? '--active' : ''}${control === 'favorite' && movie.userDetails.isInFavorite ? '--active' : ''}"
+    id="${control}"
+    name="${control}">
+    ${control === 'watchlist' ? `Add to ${control}` : ''}
+    ${control === 'watched' ? `Already ${control}` : ''}
+    ${control === 'favorite' ? `Add to ${control}` : ''}
+  </button>`).join('')
+);
+
 const createPopupTemplate = (movie, newComment) => {
   const {filmInfo} = movie;
 
-  const watchlistClassActive = movie.userDetails.isInWatchlist
-    ? '--active'
-    : '';
-
-  const alreadyWatchedClassActive = movie.userDetails.isAlreadyWatched
-    ? '--active'
-    : '';
-
-  const favoriteClassActive = movie.userDetails.isInFavorite
-    ? '--active'
-    : '';
+  const controlsTemplate = createPopupControlsTemplate(movie);
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -121,29 +123,7 @@ const createPopupTemplate = (movie, newComment) => {
         </div>
 
         <section class="film-details__controls">
-          <button
-            type="button"
-            class="film-details__control-button film-details__control-button--watchlist film-details__control-button${watchlistClassActive}"
-            id="watchlist"
-            name="watchlist">
-            Add to watchlist
-          </button>
-
-          <button
-            type="button"
-            class="film-details__control-button film-details__control-button--watched film-details__control-button${alreadyWatchedClassActive}"
-            id="watched"
-            name="watched">
-            Already watched
-          </button>
-
-          <button
-            type="button"
-            class="film-details__control-button film-details__control-button--favorite film-details__control-button${favoriteClassActive}"
-            id="favorite"
-            name="favorite">
-            Add to favorites
-          </button>
+          ${controlsTemplate}
         </section>
       </div>
 
@@ -190,6 +170,11 @@ export default class PopupView extends SmartView {
 
   get template() {
     return createPopupTemplate(this._data, this.#newComment);
+  }
+
+  reset = () => {
+    this.#newComment = {...this.#newComment, emotion: ''};
+    this.updateElement();
   }
 
   restoreHandlers = () => {
@@ -250,12 +235,4 @@ export default class PopupView extends SmartView {
   }
 
   static parseMovieToData = (movie) => ({...movie});
-
-  static parseDataToMovie = (data) => {
-    const movie = {...data};
-
-    window.scrollTo(0, JSON.parse(localStorage.rememberScroll)[0].scroll);
-
-    return movie;
-  }
 }

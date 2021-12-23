@@ -104,6 +104,7 @@ export default class MoviesSectionPresenter {
       this.#footerContainer.querySelector('.film-details__close-btn').click();
     }
     this.#filterMovies(filterType);
+    this.#closeOpenedPopup();
     this.#clearFilter(filterType);
     this.#renderFilters(this.#mainNavComponent.element, filterType);
     this.#clearMovieList();
@@ -132,8 +133,6 @@ export default class MoviesSectionPresenter {
     }
     this.#sortMovies(sortType);
     this.#closeOpenedPopup();
-    this.#clearSort();
-    this.#renderSort(sortType);
     this.#clearMovieList();
     this.#renderMainBlockMovies();
   }
