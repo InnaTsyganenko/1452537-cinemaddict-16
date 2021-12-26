@@ -19,6 +19,6 @@ export const generateComment = () => ({
   id: nanoid(),
   author: generateCommentAuthor(),
   comment: getRandomArrayElements(TEXT, 1),
-  date: dayjs().subtract(getRandomInteger(0, 5000), 'day'),
+  date: dayjs().subtract(getRandomInteger(0, 10000000), 'second'),
   emotion: EMOTIONS[getRandomInteger(0, EMOTIONS.length - 1)],
 });

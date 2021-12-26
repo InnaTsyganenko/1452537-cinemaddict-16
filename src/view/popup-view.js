@@ -3,8 +3,10 @@ import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
 import {EMOTIONS, CONTROLS_BUTTON} from '../const';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import {nanoid} from 'nanoid';
 
+dayjs.extend(relativeTime);
 
 const NEW_COMMENT = {
   id: nanoid(),
@@ -37,7 +39,9 @@ const createPopupCommentsListTemplate = (comments) => comments.sort((a,b) => (b.
       <p class="film-details__comment-text">${comment.comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${comment.date.format('YYYY/MM/DD HH:MM')}</span>
+        <span class="film-details__comment-day">${comment.date === dayjs() || comment.date >= dayjs().subtract(10, 'second')
+    ? 'now'
+    : comment.date.fromNow()}</span>
         <button class="film-details__comment-delete">Delete</button>
       </p>
     </div>
@@ -164,6 +168,7 @@ export default class PopupView extends SmartView {
     this.#newComment = newComment;
 
     this._data = PopupView.parseMovieToData(movie);
+    this._scrollPos = 0;
 
     this.#setInnerHandlers();
   }
@@ -178,6 +183,10 @@ export default class PopupView extends SmartView {
   }
 
   restoreHandlers = () => {
+    this.setClosePopupHandler(this._callback.click);
+    this.setMoviePopupWatchlistClickHandler(this._callback.watchlistClick);
+    this.setMoviePopupWatchedClickHandler(this._callback.watchedClick);
+    this.setMoviePopupFavoriteClickHandler(this._callback.favoriteClick);
     this.#setInnerHandlers();
   }
 
@@ -212,25 +221,42 @@ export default class PopupView extends SmartView {
 
   #movieWatchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchlistClick();
+    this.#executeClickHandler('movieWatchlist');
   }
 
   #movieWatchedClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.watchedClick();
+    this.#executeClickHandler('movieWatched');
   }
 
   #movieFavoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.favoriteClick();
+    this.#executeClickHandler('movieFavorite');
   }
 
   #emotionToggleHandler = (evt) => {
     evt.preventDefault();
     const newComment = this.#newComment;
     newComment.emotion = evt.target.value;
+    this.#executeClickHandler('emotionToggle');
+  }
+
+  #executeClickHandler = (clickHandlerId) => {
     const scrollPosY = document.querySelector('.film-details').scrollTop;
-    this.updateElement();
+    switch(clickHandlerId) {
+      case 'movieWatchlist':
+        this._callback.watchlistClick();
+        break;
+      case 'movieWatched':
+        this._callback.watchedClick();
+        break;
+      case 'movieFavorite':
+        this._callback.favoriteClick();
+        break;
+      case 'emotionToggle':
+        this.updateElement();
+        break;
+    }
     document.querySelector('.film-details').scroll(0, scrollPosY);
   }
 
