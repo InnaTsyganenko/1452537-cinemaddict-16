@@ -15,7 +15,7 @@ export const TEXT = [
   'In rutrum ac purus sit amet tempus.',
 ];
 export const USER_RANK = ['Novice', 'Fan', 'Movie Buff'];
-export const FILTERS_VALUES = ['all', 'watchlist', 'history', 'favorites'];
+export const CONTROLS_BUTTON = ['watchlist', 'watched', 'favorite'];
 
 export const FilterType = {
   ALL: 'all',
