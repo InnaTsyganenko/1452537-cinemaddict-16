@@ -4,13 +4,13 @@ import {createPopupGenresTemplate} from './popup-genres-view';
 import {EMOTIONS, CONTROLS_BUTTON} from '../const';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {nanoid} from 'nanoid';
+import he from 'he';
 
 dayjs.extend(relativeTime);
 
 const NEW_COMMENT = {
-  id: nanoid(),
-  author: '',
+  id: '',
+  author: 'Jhon Dow',
   comment: '',
   date: dayjs(),
   emotion: '',
@@ -42,7 +42,7 @@ const createPopupCommentsListTemplate = (comments) => comments.sort((a,b) => (b.
         <span class="film-details__comment-day">${comment.date === dayjs() || comment.date >= dayjs().subtract(10, 'second')
     ? 'now'
     : comment.date.fromNow()}</span>
-        <button class="film-details__comment-delete">Delete</button>
+        <button class="film-details__comment-delete" id="${comment.id}">Delete</button>
       </p>
     </div>
   </li>`).join('');
@@ -168,6 +168,7 @@ export default class PopupView extends SmartView {
     this.#newComment = newComment;
 
     this._data = PopupView.parseMovieToData(movie);
+
     this._scrollPos = 0;
 
     this.#setInnerHandlers();
@@ -178,7 +179,7 @@ export default class PopupView extends SmartView {
   }
 
   reset = () => {
-    this.#newComment = {...this.#newComment, emotion: ''};
+    this.#newComment = {...this.#newComment, emotion: '', comment: ''};
     this.updateElement();
   }
 
@@ -187,7 +188,16 @@ export default class PopupView extends SmartView {
     this.setMoviePopupWatchlistClickHandler(this._callback.watchlistClick);
     this.setMoviePopupWatchedClickHandler(this._callback.watchedClick);
     this.setMoviePopupFavoriteClickHandler(this._callback.favoriteClick);
+    this.setPopupDeleteCommentHandler(this._callback.deleteCommentClick);
+    this.setPopupAddCommentHandler(this._callback.addCommentClick);
     this.#setInnerHandlers();
+  }
+
+  #ctrlEnterKeyDownHandler = (evt) => {
+    if (evt.ctrlKey && evt.key === 'Enter') {
+      evt.preventDefault();
+      this.#executeClickHandler('addComment');
+    }
   }
 
   setClosePopupHandler = (callback) => {
@@ -210,8 +220,20 @@ export default class PopupView extends SmartView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#movieFavoriteClickHandler);
   }
 
+  setPopupDeleteCommentHandler = (callback) => {
+    this._callback.deleteCommentClick = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#deleteCommentHandler));
+  }
+
+  setPopupAddCommentHandler = (callback) => {
+    this._callback.addCommentClick = callback;
+    this.element.querySelector('.film-details__new-comment').addEventListener('keydown', this.#ctrlEnterKeyDownHandler);
+  }
+
   #setInnerHandlers = () => {
     this.element.querySelectorAll('.film-details__emoji-item').forEach((emotion) => emotion.addEventListener('click', this.#emotionToggleHandler));
+
+    this.element.querySelector('.film-details__new-comment').addEventListener('keydown', this.#ctrlEnterKeyDownHandler);
   }
 
   #closePopupClickHandler = (evt) => {
@@ -236,13 +258,18 @@ export default class PopupView extends SmartView {
 
   #emotionToggleHandler = (evt) => {
     evt.preventDefault();
-    const newComment = this.#newComment;
-    newComment.emotion = evt.target.value;
-    this.#executeClickHandler('emotionToggle');
+    this.#newComment.emotion = evt.target.value;
+    this.#executeClickHandler('toggleEmotion');
   }
 
-  #executeClickHandler = (clickHandlerId) => {
+  #deleteCommentHandler = (evt) => {
+    evt.preventDefault();
+    this.#executeClickHandler('deleteComment', evt.target.id);
+  }
+
+  #executeClickHandler = (clickHandlerId, commentId = null, newComment = this.#newComment) => {
     const scrollPosY = document.querySelector('.film-details').scrollTop;
+    this.#newComment.comment = this.element.querySelector('.film-details__comment-input').value;
     switch(clickHandlerId) {
       case 'movieWatchlist':
         this._callback.watchlistClick();
@@ -253,11 +280,20 @@ export default class PopupView extends SmartView {
       case 'movieFavorite':
         this._callback.favoriteClick();
         break;
-      case 'emotionToggle':
-        this.updateElement();
+      case 'deleteComment':
+        this._callback.deleteCommentClick(commentId);
+        break;
+      case 'addComment':
+        this._callback.addCommentClick(newComment);
+        this.#newComment = NEW_COMMENT;
         break;
     }
+    this.updateElement();
+    this.element.querySelector('.film-details__comment-input').value = he.encode(this.#newComment.comment);
     document.querySelector('.film-details').scroll(0, scrollPosY);
+    if (clickHandlerId === 'toggleEmotion') {
+      this.element.querySelector('.film-details__comment-input').focus();
+    }
   }
 
   static parseMovieToData = (movie) => ({...movie});

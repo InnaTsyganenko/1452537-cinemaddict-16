@@ -1,6 +1,8 @@
 import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
+import {UserAction, UpdateType} from '../const.js';
 import {render, RenderPosition, remove, replace} from '../utils/render';
+import { nanoid } from 'nanoid';
 
 export default class MoviePresenter {
   #moviesContainer = null;
@@ -38,13 +40,15 @@ export default class MoviePresenter {
     this.#popupComponent.setMoviePopupWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setMoviePopupWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setMoviePopupFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#popupComponent.setPopupDeleteCommentHandler(this.#handleDeleteCommentClick);
+    this.#popupComponent.setPopupAddCommentHandler(this.#handleAddCommentClick);
 
     if (prevMovieCardComponent === null) {
       render(this.#moviesContainer, this.#movieCardComponent, RenderPosition.BEFOREEND);
       return;
     }
 
-    if (this.#movieCardComponent !== prevMovieCardComponent) {
+    if (prevMovieCardComponent.element.parentElement !== null && this.#movieCardComponent !== prevMovieCardComponent) {
       replace(this.#movieCardComponent, prevMovieCardComponent);
     }
 
@@ -81,16 +85,55 @@ export default class MoviePresenter {
 
   #handleWatchlistClick = () => {
     this.#movie.userDetails.isInWatchlist = !this.#movie.userDetails.isInWatchlist;
-    return this.#changeData({...this.#movie});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie}
+    );
   }
 
   #handleWatchedClick = () => {
     this.#movie.userDetails.isAlreadyWatched = !this.#movie.userDetails.isAlreadyWatched;
-    return this.#changeData({...this.#movie});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie}
+    );
   }
 
   #handleFavoriteClick = () => {
     this.#movie.userDetails.isInFavorite = !this.#movie.userDetails.isInFavorite;
-    return this.#changeData({...this.#movie});
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie}
+    );
+  }
+
+  #handleDeleteCommentClick = (commentId) => {
+    const index = this.#movie.comments.findIndex((comment) => comment.id === commentId);
+
+    this.#movie.comments = [
+      ...this.#movie.comments.slice(0, index),
+      ...this.#movie.comments.slice(index + 1),
+    ];
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
+      {...this.#movie}
+    );
+  }
+
+  #handleAddCommentClick = (newComment) => {
+    this.#movie.comments = [
+      {...newComment, id: nanoid()},
+      ...this.#movie.comments,
+    ];
+
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.PATCH,
+      {...this.#movie}
+    );
   }
 }
