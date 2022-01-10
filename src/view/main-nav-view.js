@@ -8,4 +8,15 @@ export default class MainNavView extends AbstractView {
   get template() {
     return createMainNavTemplate();
   }
+
+  setMenuClickHandler = (callback) => {
+    this._callback.menuClick = callback;
+    this.element.querySelector('.main-navigation__additional').addEventListener('click', this.#menuClickHandler);
+  }
+
+  #menuClickHandler = (evt) => {
+    evt.preventDefault();
+    evt.target.classList.toggle('main-navigation__additional--active');
+    this._callback.menuClick(evt.target.classList);
+  }
 }
