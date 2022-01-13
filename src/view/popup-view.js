@@ -31,17 +31,18 @@ const createCommentEmotionsTemplate = () => (
   </label>`).join('')
 );
 
-const createPopupCommentsListTemplate = (comments) => comments.sort((a,b) => (b.date - a.date)).map((comment) => `<li class="film-details__comment">
+const createPopupCommentsListTemplate = (comments) => comments.sort((a, b) => (b.date - a.date)).map((comment) => `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
+    ${comment.emotion === undefined ? '' : `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">`}
     </span>
     <div>
       <p class="film-details__comment-text">${comment.comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${comment.date === dayjs() || comment.date >= dayjs().subtract(10, 'second')
+        <span class="film-details__comment-day">
+        ${comment.date === dayjs() || comment.date >= dayjs().subtract(10, 'second')
     ? 'now'
-    : comment.date.fromNow()}</span>
+    : dayjs(comment.date).fromNow()}</span>
         <button class="film-details__comment-delete" id="${comment.id}">Delete</button>
       </p>
     </div>
@@ -60,7 +61,7 @@ const createPopupControlsTemplate = (movie) => (
 );
 
 const createPopupTemplate = (movie, newComment) => {
-  const {filmInfo} = movie;
+  const {filmInfo, comments, commentsData} = movie;
 
   const controlsTemplate = createPopupControlsTemplate(movie);
 
@@ -104,7 +105,7 @@ const createPopupTemplate = (movie, newComment) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${filmInfo.release.date.format('DD MMMM YYYY')}</td>
+                <td class="film-details__cell">${dayjs(filmInfo.release.date).format('DD MMMM YYYY')}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
@@ -133,10 +134,10 @@ const createPopupTemplate = (movie, newComment) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${movie.comments.length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createPopupCommentsListTemplate(movie.comments)}
+            ${createPopupCommentsListTemplate(commentsData)}
           </ul>
 
           <div class="film-details__new-comment">
