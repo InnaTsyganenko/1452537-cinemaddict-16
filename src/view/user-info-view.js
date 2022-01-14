@@ -7,9 +7,9 @@ const createUserInfoTemplate = (movieHistoryCount) => (
       ${movieHistoryCount > 0 && movieHistoryCount <=10 ? 'Novice' : ''}
       ${movieHistoryCount >= 11 && movieHistoryCount <=20 ? 'Fan' : ''}
       ${movieHistoryCount >= 21 ? 'Movie Buff' : ''}
-    </p>
+    </p>`}
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-  </section>`}`
+  </section>`
 );
 
 export default class UserInfoView extends AbstractView {

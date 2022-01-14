@@ -31,7 +31,7 @@ const moviesPresenter = new MoviesPresenter(siteMainElement, siteFooterElement, 
 
 const handleSiteMenuClick = (menuItem) => {
   let statsComponent =  null;
-  const userRank = siteHeaderElement.querySelector('.profile__rating').textContent;
+  const userRank = ((siteHeaderElement.querySelector('.profile__rating') === null) ? '' : siteHeaderElement.querySelector('.profile__rating').textContent);
   const userSrcImg = siteHeaderElement.querySelector('.profile__avatar').src;
   const isInHistoryMovies = moviesModel.movies.filter((movie) => movie.userDetails.isAlreadyWatched);
   switch (menuItem.value) {
