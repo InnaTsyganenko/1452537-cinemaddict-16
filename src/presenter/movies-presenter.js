@@ -15,10 +15,9 @@ export default class MoviesPresenter {
   #mainContainer = null;
   #footerContainer = null;
   #moviesModel = null;
-  #filterModel = null;
-  #userInfoModel = null;
-  #noMovieComponent = null;
   #showMoreButtonComponent = null;
+  #filterModel = null;
+  #noMovieComponent = null;
 
   #moviesSectionComponent = new MoviesSectionView();
   #moviesListComponent = new MoviesListView();
@@ -32,18 +31,16 @@ export default class MoviesPresenter {
   #renderedMovieCount = MOVIE_COUNT_PER_STEP;
   #moviesMainPresenter = new Map();
 
-  constructor(mainContainer, footerContainer, moviesModel, filterModel, userInfoModel) {
+  constructor(mainContainer, footerContainer, moviesModel, filterModel) {
     this.#mainContainer = mainContainer;
     this.#footerContainer = footerContainer;
     this.#moviesModel = moviesModel;
     this.#filterModel = filterModel;
-    this.#userInfoModel = userInfoModel;
   }
 
   get movies() {
     this.#filterType = this.#filterModel.filter;
     const movies = [...this.#moviesModel.movies];
-    this.#userInfoModel.setMovieCount(movies.filter((movie) => movie.userDetails.isAlreadyWatched === true).length);
     const filteredmovies = filter[this.#filterType](movies);
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -199,7 +196,7 @@ export default class MoviesPresenter {
       this.#renderSort(this.#currentSortType);
     }
 
-    movies.slice(0, this.#renderedMovieCount).forEach((movie) => this.#renderMovieCard(this.#moviesListContainerComponent, movie));
+    this.movies.slice(0, this.#renderedMovieCount).forEach((movie) => this.#renderMovieCard(this.#moviesListContainerComponent, movie));
 
     if (movieCount > this.#renderedMovieCount) {
       this.#renderShowMoreButton();

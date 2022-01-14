@@ -1,12 +1,11 @@
 
+import UserInfoView from './view/user-info-view';
 import MainNavView from './view/main-nav-view';
 import StatsView from './view/stats-view';
 import NumberOfFilmsView from './view/number-of-films-view';
-import UserInfoPresenter from './presenter/user-info-presenter';
-import FilterPresenter from './presenter/filter-presenter';
+import FilterPresenter from './presenter/filter-presenter.js';
 import MoviesPresenter from './presenter/movies-presenter';
 import {render, RenderPosition} from './utils/render';
-import UserInfoModel from './model/user-info-model';
 import FilterModel from './model/filter-model';
 import MoviesModel from './model/movies-model';
 import ApiService from './api-service';
@@ -18,21 +17,15 @@ const mainNavComponent = new MainNavView();
 
 const moviesModel = new MoviesModel(new ApiService(END_POINT, AUTHORIZATION));
 
-const userInfoModel = new UserInfoModel();
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 
-const userInfoPresenter = new UserInfoPresenter(siteHeaderElement, userInfoModel, moviesModel);
-const filterPresenter = new FilterPresenter(mainNavComponent.element, filterModel, moviesModel);
-const moviesPresenter = new MoviesPresenter(siteMainElement, siteFooterElement, moviesModel, filterModel, userInfoModel);
 
-export const MenuState = {
-  FILTERS: 'filters',
-  STATS: 'stats',
-};
+const filterPresenter = new FilterPresenter(mainNavComponent.element, filterModel, moviesModel);
+const moviesPresenter = new MoviesPresenter(siteMainElement, siteFooterElement, moviesModel, filterModel);
 
 const handleSiteMenuClick = (menuItem) => {
   let statsComponent =  null;
@@ -52,11 +45,11 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-userInfoPresenter.init();
 filterPresenter.init();
 moviesPresenter.init();
 
 moviesModel.init().finally(() => {
+  render(siteHeaderElement, new UserInfoView(), RenderPosition.BEFOREEND);
   render(siteMainElement, mainNavComponent, RenderPosition.AFTERBEGIN);
   mainNavComponent.setMenuClickHandler(handleSiteMenuClick);
 
