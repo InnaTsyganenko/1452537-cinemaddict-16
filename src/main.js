@@ -1,5 +1,4 @@
 
-import UserInfoView from './view/user-info-view';
 import MainNavView from './view/main-nav-view';
 import StatsView from './view/stats-view';
 import NumberOfFilmsView from './view/number-of-films-view';
