@@ -29,11 +29,6 @@ const userInfoPresenter = new UserInfoPresenter(siteHeaderElement, userInfoModel
 const filterPresenter = new FilterPresenter(mainNavComponent.element, filterModel, moviesModel);
 const moviesPresenter = new MoviesPresenter(siteMainElement, siteFooterElement, moviesModel, filterModel, userInfoModel);
 
-export const MenuState = {
-  FILTERS: 'filters',
-  STATS: 'stats',
-};
-
 const handleSiteMenuClick = (menuItem) => {
   let statsComponent =  null;
   const userRank = siteHeaderElement.querySelector('.profile__rating').textContent;
