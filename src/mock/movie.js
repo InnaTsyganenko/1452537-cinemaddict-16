@@ -82,7 +82,6 @@ const generateMovieGenres = () => {
     'Comedy',
     'Serial',
     'Romance',
-    'Comedy',
     'Detective',
     'Thriller',
     'Crime',
@@ -112,7 +111,7 @@ const generateMovieReleaseCountry = () => {
 export const generateMovie = () => {
   const isAlreadyWatched = Boolean(getRandomInteger(0, 1));
   const watchingDate = isAlreadyWatched
-    ? dayjs().subtract(getRandomInteger(0, 5000), 'day')
+    ? dayjs().subtract(getRandomInteger(0, 100), 'day')
     : null;
 
   return {
