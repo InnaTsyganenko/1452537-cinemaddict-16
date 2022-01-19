@@ -2,7 +2,6 @@ import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
 import {UserAction, UpdateType} from '../const.js';
 import {render, RenderPosition, remove, replace} from '../utils/render';
-import { nanoid } from 'nanoid';
 
 export default class MoviePresenter {
   #moviesContainer = null;
@@ -131,7 +130,7 @@ export default class MoviePresenter {
 
   #handleAddCommentClick = (newComment) => {
     this.#movie.comments = [
-      {...newComment, id: nanoid()},
+      {...newComment},
       ...this.#movie.comments,
     ];
 
