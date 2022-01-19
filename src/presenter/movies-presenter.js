@@ -220,7 +220,6 @@ export default class MoviesPresenter {
       this.#renderLoading();
       return;
     }
-
     this.#renderMainBlockMovies();
   }
 }
