@@ -7,13 +7,15 @@ export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #moviesModel = null;
+  #userInfoModel = null;
 
   #filterComponent = null;
 
-  constructor(filterContainer, filterModel, moviesModel) {
+  constructor(filterContainer, filterModel, moviesModel, userInfoModel) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
+    this.#userInfoModel = userInfoModel;
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);

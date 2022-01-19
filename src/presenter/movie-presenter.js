@@ -2,7 +2,6 @@ import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
 import {UserAction, UpdateType} from '../const.js';
 import {render, RenderPosition, remove, replace} from '../utils/render';
-import { nanoid } from 'nanoid';
 
 export default class MoviePresenter {
   #moviesContainer = null;
@@ -26,22 +25,14 @@ export default class MoviePresenter {
     const prevPopupComponent = this.#popupComponent;
 
     this.#movieCardComponent = new MovieCardView(movie);
-    this.#popupComponent = new PopupView(movie);
 
     this.#siteFooterElement = document.querySelector('.footer');
 
     this.#movieCardComponent.setMovieLinkClickHandler(this.#handleMovieLinkClick);
-    this.#popupComponent.setClosePopupHandler(this.#handleClosePopupClick);
 
     this.#movieCardComponent.setMovieWatchlistClickHandler(this.#handleWatchlistClick);
     this.#movieCardComponent.setMovieWatchedClickHandler(this.#handleWatchedClick);
     this.#movieCardComponent.setMovieFavoriteClickHandler(this.#handleFavoriteClick);
-
-    this.#popupComponent.setMoviePopupWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#popupComponent.setMoviePopupWatchedClickHandler(this.#handleWatchedClick);
-    this.#popupComponent.setMoviePopupFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#popupComponent.setPopupDeleteCommentHandler(this.#handleDeleteCommentClick);
-    this.#popupComponent.setPopupAddCommentHandler(this.#handleAddCommentClick);
 
     if (prevMovieCardComponent === null) {
       render(this.#moviesContainer, this.#movieCardComponent, RenderPosition.BEFOREEND);
@@ -52,7 +43,7 @@ export default class MoviePresenter {
       replace(this.#movieCardComponent, prevMovieCardComponent);
     }
 
-    if (prevPopupComponent.element.parentElement !== null && this.#popupComponent !== prevPopupComponent) {
+    if (this.#popupComponent !== null && prevPopupComponent.element.parentElement !== null && this.#popupComponent !== prevPopupComponent) {
       replace(this.#popupComponent, prevPopupComponent);
     }
     remove(prevMovieCardComponent);
@@ -74,13 +65,26 @@ export default class MoviePresenter {
   }
 
   #handleMovieLinkClick = () => {
-    if (this.#siteFooterElement.firstElementChild.classList.contains('film-details')) {
-      this.#siteFooterElement.querySelector('.film-details__close-btn').click();
-    }
-    render(this.#siteFooterElement, this.#popupComponent.element, RenderPosition.AFTERBEGIN);
-    this.#popupComponent.setClosePopupHandler(this.#handleClosePopupClick);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    document.querySelector('body').classList.add('hide-overflow');
+    this.#changeData(
+      UserAction.GET_COMMENTS,
+      UpdateType.PATCH,
+      {...this.#movie}).finally(() => {
+      if (this.#siteFooterElement.firstElementChild.classList.contains('film-details')) {
+        this.#siteFooterElement.querySelector('.film-details__close-btn').click();
+      }
+
+      this.#popupComponent = new PopupView(this.#movie);
+
+      render(this.#siteFooterElement, this.#popupComponent.element, RenderPosition.AFTERBEGIN);
+      document.addEventListener('keydown', this.#escKeyDownHandler);
+      document.querySelector('body').classList.add('hide-overflow');
+      this.#popupComponent.setClosePopupHandler(this.#handleClosePopupClick);
+      this.#popupComponent.setMoviePopupWatchlistClickHandler(this.#handleWatchlistClick);
+      this.#popupComponent.setMoviePopupWatchedClickHandler(this.#handleWatchedClick);
+      this.#popupComponent.setMoviePopupFavoriteClickHandler(this.#handleFavoriteClick);
+      this.#popupComponent.setPopupDeleteCommentHandler(this.#handleDeleteCommentClick);
+      this.#popupComponent.setPopupAddCommentHandler(this.#handleAddCommentClick);
+    });
   };
 
   #handleWatchlistClick = () => {
@@ -126,7 +130,7 @@ export default class MoviePresenter {
 
   #handleAddCommentClick = (newComment) => {
     this.#movie.comments = [
-      {...newComment, id: nanoid()},
+      {...newComment},
       ...this.#movie.comments,
     ];
 

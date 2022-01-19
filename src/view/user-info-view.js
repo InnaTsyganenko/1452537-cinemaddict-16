@@ -1,18 +1,26 @@
 import AbstractView from './abstract-view.js';
-import {USER_RANK} from '../const';
-import {getRandomInteger} from '../utils/common';
 
-const createUserInfoTemplate = () => (
+const createUserInfoTemplate = (movieHistoryCount) => (
   `<section class="header__profile profile">
+    ${movieHistoryCount === 0 ? '' : `
     <p class="profile__rating">
-      ${USER_RANK[getRandomInteger(0, USER_RANK.length - 1)]}
-    </p>
+      ${movieHistoryCount > 0 && movieHistoryCount <=10 ? 'Novice' : ''}
+      ${movieHistoryCount >= 11 && movieHistoryCount <=20 ? 'Fan' : ''}
+      ${movieHistoryCount >= 21 ? 'Movie Buff' : ''}
+    </p>`}
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`
 );
 
 export default class UserInfoView extends AbstractView {
+  #movieHistoryCount = null;
+
+  constructor(movieHistoryCount) {
+    super();
+    this.#movieHistoryCount = movieHistoryCount;
+  }
+
   get template() {
-    return createUserInfoTemplate();
+    return createUserInfoTemplate(this.#movieHistoryCount);
   }
 }
