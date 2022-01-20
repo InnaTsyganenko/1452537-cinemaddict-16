@@ -1,8 +1,7 @@
 export const MOVIE_COUNT_PER_STEP = 5;
-export const EMOTIONS = ['smile', 'sleeping', 'puke','angry'];
+export const emotions = ['smile', 'sleeping', 'puke','angry'];
 
-export const USER_RANK = ['Novice', 'Fan', 'Movie Buff'];
-export const CONTROLS_BUTTON = ['watchlist', 'watched', 'favorite'];
+export const controls = ['watchlist', 'watched', 'favorite'];
 
 export const FilterType = {
   ALL: 'all',
@@ -19,9 +18,9 @@ export const SortType = {
 
 export const UserAction = {
   UPDATE_MOVIE: 'UPDATE_MOVIE',
-  DELETE_COMMENT: 'DELETE_COMMENT',
-  ADD_COMMENT: 'ADD_COMMENT',
   GET_COMMENTS: 'GET_COMMENTS',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
 };
 
 export const UpdateType = {

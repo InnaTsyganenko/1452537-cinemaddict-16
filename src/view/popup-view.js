@@ -1,7 +1,7 @@
 import SmartView from './smart-view.js';
 import {formatRunTime} from '../utils/movie';
 import {createPopupGenresTemplate} from './popup-genres-view';
-import {EMOTIONS, CONTROLS_BUTTON} from '../const';
+import {emotions, controls} from '../const';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import he from 'he';
@@ -9,20 +9,18 @@ import he from 'he';
 dayjs.extend(relativeTime);
 
 const NEW_COMMENT = {
-  id: '',
-  author: 'Jhon Dow',
   comment: '',
-  date: dayjs(),
   emotion: '',
 };
 
-const createCommentEmotionsTemplate = () => (
-  EMOTIONS.map((emotion) => `<input
+const createCommentEmotionsTemplate = (isDisabled) => (
+  emotions.map((emotion) => `<input
     class="film-details__emoji-item visually-hidden"
     name="comment-emoji"
     type="radio"
     id="emoji-${emotion}"
     value="${emotion}"
+    ${isDisabled ? 'disabled' : ''}
   />
   <label
     class="film-details__emoji-label"
@@ -31,7 +29,7 @@ const createCommentEmotionsTemplate = () => (
   </label>`).join('')
 );
 
-const createPopupCommentsListTemplate = (comments) => comments.sort((a, b) => (b.date - a.date)).map((comment) => `<li class="film-details__comment">
+const createPopupCommentsListTemplate = (comments, isDisabled, deleteCommentId) => comments.sort((a, b) => (new Date(b.date) - new Date(a.date))).map((comment) => `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
     ${comment.emotion === undefined ? '' : `<img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">`}
     </span>
@@ -43,13 +41,13 @@ const createPopupCommentsListTemplate = (comments) => comments.sort((a, b) => (b
         ${comment.date === dayjs() || comment.date >= dayjs().subtract(10, 'second')
     ? 'now'
     : dayjs(comment.date).fromNow()}</span>
-        <button class="film-details__comment-delete" id="${comment.id}">Delete</button>
+        <button class="film-details__comment-delete" id="${comment.id}" ${isDisabled ? 'disabled' : ''}>${isDisabled && deleteCommentId === comment.id ?'Deleting...' : 'Delete'}</button>
       </p>
     </div>
   </li>`).join('');
 
 const createPopupControlsTemplate = (movie) => (
-  CONTROLS_BUTTON.map((control) => `<button
+  controls.map((control) => `<button
     type="button"
     class="film-details__control-button film-details__control-button--${control} film-details__control-button${control === 'watchlist' && movie.userDetails.isInWatchlist ? '--active' : ''}${control === 'watched' && movie.userDetails.isAlreadyWatched ? '--active' : ''}${control === 'favorite' && movie.userDetails.isInFavorite ? '--active' : ''}"
     id="${control}"
@@ -60,12 +58,12 @@ const createPopupControlsTemplate = (movie) => (
   </button>`).join('')
 );
 
-const createPopupTemplate = (movie, newComment) => {
-  const {filmInfo, comments, commentsData} = movie;
+const createPopupTemplate = (movie, newComment, deleteCommentId) => {
+  const {filmInfo, comments, commentsData, isDisabled} = movie;
 
   const controlsTemplate = createPopupControlsTemplate(movie);
 
-  return `<section class="film-details">
+  return `<section class="film-details" id="${movie.id}">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
@@ -116,7 +114,7 @@ const createPopupTemplate = (movie, newComment) => {
                 <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
               </tr>
               <tr class="film-details__row">
-                <td class="film-details__term">Genres</td>
+                <td class="film-details__term">${filmInfo.genres.length > 1 ? 'Genres' : 'Genre'}</td>
                 <td class="film-details__cell">
                   ${createPopupGenresTemplate(filmInfo.genres)}
                 </td>
@@ -136,9 +134,10 @@ const createPopupTemplate = (movie, newComment) => {
         <section class="film-details__comments-wrap">
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
-          <ul class="film-details__comments-list">
-            ${createPopupCommentsListTemplate(commentsData)}
-          </ul>
+          ${commentsData === undefined ? '' :
+    `<ul class="film-details__comments-list">
+      ${createPopupCommentsListTemplate(commentsData, isDisabled, deleteCommentId)}
+    </ul>`}
 
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label">
@@ -148,11 +147,11 @@ const createPopupTemplate = (movie, newComment) => {
             </div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="${isDisabled ? newComment.comment : 'Select reaction below and write comment here'}" name="comment" ${isDisabled ? 'disabled' : ''}>${newComment.comment}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
-              ${createCommentEmotionsTemplate()}
+              ${createCommentEmotionsTemplate(isDisabled)}
             </div>
           </div>
         </section>
@@ -163,29 +162,23 @@ const createPopupTemplate = (movie, newComment) => {
 
 export default class PopupView extends SmartView {
   #newComment = null;
+  #deleteCommentId = null;
 
   constructor(movie, newComment = NEW_COMMENT) {
     super();
-    this.#newComment = newComment;
 
     this._data = PopupView.parseMovieToData(movie);
-
-    this._scrollPos = 0;
+    this.#newComment = PopupView.parseCommentToData(newComment);
 
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createPopupTemplate(this._data, this.#newComment);
-  }
-
-  reset = () => {
-    this.#newComment = {...this.#newComment, emotion: '', comment: ''};
-    this.updateElement();
+    return createPopupTemplate(this._data, this.#newComment, this.#deleteCommentId);
   }
 
   restoreHandlers = () => {
-    this.setClosePopupHandler(this._callback.click);
+    this.setClosePopupHandler(this._callback.closeClick);
     this.setMoviePopupWatchlistClickHandler(this._callback.watchlistClick);
     this.setMoviePopupWatchedClickHandler(this._callback.watchedClick);
     this.setMoviePopupFavoriteClickHandler(this._callback.favoriteClick);
@@ -197,12 +190,12 @@ export default class PopupView extends SmartView {
   #ctrlEnterKeyDownHandler = (evt) => {
     if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
-      this.#executeClickHandler('addComment');
+      this._callback.addCommentClick(this.#newComment);
     }
   }
 
   setClosePopupHandler = (callback) => {
-    this._callback.click = callback;
+    this._callback.closeClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closePopupClickHandler);
   }
 
@@ -234,68 +227,52 @@ export default class PopupView extends SmartView {
   #setInnerHandlers = () => {
     this.element.querySelectorAll('.film-details__emoji-item').forEach((emotion) => emotion.addEventListener('click', this.#emotionToggleHandler));
 
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#getCommentTextHandler);
+
     this.element.querySelector('.film-details__new-comment').addEventListener('keydown', this.#ctrlEnterKeyDownHandler);
   }
 
   #closePopupClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.closeClick();
   }
 
   #movieWatchlistClickHandler = (evt) => {
     evt.preventDefault();
-    this.#executeClickHandler('movieWatchlist');
+    this._callback.watchlistClick();
   }
 
   #movieWatchedClickHandler = (evt) => {
     evt.preventDefault();
-    this.#executeClickHandler('movieWatched');
+    this._callback.watchedClick();
   }
 
   #movieFavoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#executeClickHandler('movieFavorite');
+    this._callback.favoriteClick();
   }
 
   #emotionToggleHandler = (evt) => {
     evt.preventDefault();
     this.#newComment.emotion = evt.target.value;
-    this.#executeClickHandler('toggleEmotion');
+    this.updateElement();
+    this.element.querySelector('.film-details__comment-input').focus();
+  }
+
+  #getCommentTextHandler = (evt) => {
+    evt.preventDefault();
+    this.#newComment.comment = he.encode(evt.target.value);
   }
 
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
-    this.#executeClickHandler('deleteComment', evt.target.id);
+    this.#deleteCommentId = evt.target.id;
+    this._callback.deleteCommentClick(evt.target.id);
   }
 
-  #executeClickHandler = (clickHandlerId, commentId = null, newComment = this.#newComment) => {
-    const scrollPosY = document.querySelector('.film-details').scrollTop;
-    this.#newComment.comment = this.element.querySelector('.film-details__comment-input').value;
-    switch(clickHandlerId) {
-      case 'movieWatchlist':
-        this._callback.watchlistClick();
-        break;
-      case 'movieWatched':
-        this._callback.watchedClick();
-        break;
-      case 'movieFavorite':
-        this._callback.favoriteClick();
-        break;
-      case 'deleteComment':
-        this._callback.deleteCommentClick(commentId);
-        break;
-      case 'addComment':
-        this._callback.addCommentClick(newComment);
-        this.#newComment = NEW_COMMENT;
-        break;
-    }
-    this.updateElement();
-    this.element.querySelector('.film-details__comment-input').value = he.encode(this.#newComment.comment);
-    document.querySelector('.film-details').scroll(0, scrollPosY);
-    if (clickHandlerId === 'toggleEmotion') {
-      this.element.querySelector('.film-details__comment-input').focus();
-    }
-  }
+  static parseMovieToData = (movie) => ({...movie,
+    isDisabled: false,
+    isDeleting: false,});
 
-  static parseMovieToData = (movie) => ({...movie});
+  static parseCommentToData = (comment) => ({...comment});
 }
