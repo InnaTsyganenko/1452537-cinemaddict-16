@@ -93,6 +93,7 @@ export default class MoviePresenter {
         this.#movieCardComponent.shake(resetFormState);
         break;
     }
+
     if (this.#popupComponent && this.#scrollPos > 0) {
       this.#popupComponent.element.scroll(0, this.#scrollPos);
     }
