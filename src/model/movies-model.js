@@ -67,6 +67,46 @@ export default class MoviesModel extends AbstractObservable {
     this._notify(updateType, update);
   }
 
+  addComment = async (updateType, update) => {
+    try {
+      const response = await this.#apiService.addComment(update);
+      update.commentsData = response.comments;
+      update.comments = response.movie.comments;
+
+      this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t add comment');
+    }
+  }
+
+  deleteComment = async (updateType, update) => {
+    const index = update.comments.findIndex((comment) => comment === update.commentDel);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting comment');
+    }
+
+    try {
+      await this.#apiService.deleteComment(update.commentDel);
+      delete update.commentDel;
+
+      update.commentsData.sort((a, b) => a.id - b.id);
+
+      update.commentsData = [
+        ...update.commentsData.slice(0, index),
+        ...update.commentsData.slice(index + 1),
+      ];
+      update.comments = [
+        ...update.comments.slice(0, index),
+        ...update.comments.slice(index + 1),
+      ];
+
+      this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
+  }
+
   #adaptToClient = (movie) => {
     const adaptedMovie = {...movie,
       filmInfo: {...movie['film_info'],

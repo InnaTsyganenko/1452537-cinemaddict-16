@@ -57,4 +57,3 @@ moviesModel.init().finally(() => {
 
   render(siteFooterElement, new NumberOfFilmsView(moviesModel.movies.length), RenderPosition.BEFOREEND);
 });
-
