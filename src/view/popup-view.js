@@ -256,6 +256,7 @@ export default class PopupView extends SmartView {
     evt.preventDefault();
     this.#newComment.emotion = evt.target.value;
     this.updateElement();
+    this.element.scrollTo(0, document.body.scrollHeight);
     this.element.querySelector('.film-details__comment-input').focus();
   }
 

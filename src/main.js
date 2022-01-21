@@ -27,7 +27,7 @@ const siteFooterElement = document.querySelector('.footer');
 
 const userInfoPresenter = new UserInfoPresenter(siteHeaderElement, userInfoModel, moviesModel);
 const filterPresenter = new FilterPresenter(mainNavComponent.element, filterModel, moviesModel);
-const moviesPresenter = new MoviesPresenter(siteMainElement, moviesModel, filterModel, userInfoModel);
+const moviesPresenter = new MoviesPresenter(siteMainElement, siteFooterElement, moviesModel, filterModel, userInfoModel);
 
 const handleSiteMenuClick = (menuItem) => {
   let statsComponent =  null;

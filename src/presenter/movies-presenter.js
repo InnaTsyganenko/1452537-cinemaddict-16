@@ -13,6 +13,7 @@ import {filter} from '../utils/filter.js';
 export default class MoviesPresenter {
   #sortComponent = null;
   #mainContainer = null;
+  #footerContainer = null;
   #moviesModel = null;
   #filterModel = null;
   #userInfoModel = null;
@@ -32,8 +33,9 @@ export default class MoviesPresenter {
   #renderedMovieCount = MOVIE_COUNT_PER_STEP;
   #movieMainPresenter = new Map();
 
-  constructor(mainContainer, moviesModel, filterModel, userInfoModel) {
+  constructor(mainContainer, footerContainer, moviesModel, filterModel, userInfoModel) {
     this.#mainContainer = mainContainer;
+    this.#footerContainer = footerContainer;
     this.#moviesModel = moviesModel;
     this.#filterModel = filterModel;
     this.#userInfoModel = userInfoModel;
@@ -75,11 +77,19 @@ export default class MoviesPresenter {
   }
 
   #handleViewAction = async (actionType, updateType, update) => {
-    if (document.querySelector('.film-details')) {
-      this.#scrollPos = document.querySelector('.film-details').scrollTop;
+    if (this.#footerContainer.querySelector('.film-details')) {
+      this.#scrollPos = this.#footerContainer.querySelector('.film-details').scrollTop;
     }
+
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
+        if (this.#footerContainer.querySelector('.film-details')) {
+          try {
+            await this.#moviesModel.updateMovieComments(updateType, update);
+          } catch(err) {
+            this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+          }
+        }
         try {
           await this.#moviesModel.updateMovie(updateType, update);
         } catch(err) {
@@ -97,7 +107,7 @@ export default class MoviesPresenter {
         break;
       case UserAction.ADD_COMMENT:
         this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING);
-        this.#scrollPos = document.querySelector('.film-details').scrollTop + document.body.scrollHeight;
+        this.#scrollPos = this.#footerContainer.querySelector('.film-details').scrollHeight;
         try {
           await this.#moviesModel.addComment(updateType, update);
         } catch(err) {
@@ -123,7 +133,7 @@ export default class MoviesPresenter {
       case UpdateType.MINOR:
         this.#clearMovieList();
         this.#renderMainBlockMovies();
-        if (document.querySelector('.film-details') && document.querySelector('.film-details').id === data.id) {
+        if (this.#footerContainer.querySelector('.film-details') && this.#footerContainer.querySelector('.film-details').id === data.id) {
           this.#movieMainPresenter.get(data.id).init(data, this.#scrollPos);
         }
         break;
