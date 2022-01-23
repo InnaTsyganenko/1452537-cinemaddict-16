@@ -25,7 +25,7 @@ export default class MoviesModel extends AbstractObservable {
     this._notify(UpdateType.INIT);
   }
 
-  updateMovieComments = async (updateType, update) => {
+  getMovieComments = async (updateType, update) => {
     const index = this.#movies.findIndex((movie) => movie.id === update.id);
 
     if (index === -1) {
@@ -105,6 +105,20 @@ export default class MoviesModel extends AbstractObservable {
     } catch(err) {
       throw new Error('Can\'t delete comment');
     }
+  }
+
+  updateMoviesMostCommented = (update) => {
+    const index = this.#movies.findIndex((movie) => movie.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting movie');
+    }
+
+    this.#movies = [
+      ...this.#movies.slice(0, index),
+      update,
+      ...this.#movies.slice(index + 1),
+    ];
   }
 
   #adaptToClient = (movie) => {

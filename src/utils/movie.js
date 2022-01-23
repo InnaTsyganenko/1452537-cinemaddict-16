@@ -11,7 +11,3 @@ export const formatRunTime = (runtime) => {
   }
   return result;
 };
-
-export const isMovieInWatchlist = (movie) => movie.userDetails.isInWatchlist;
-export const isMovieAlreadyWatched = (movie) => movie.userDetails.isAlreadyWatched;
-export const isMovieInFavorite = (movie) => movie.userDetails.isInFavorite;

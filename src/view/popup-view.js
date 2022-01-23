@@ -178,12 +178,12 @@ export default class PopupView extends SmartView {
   }
 
   restoreHandlers = () => {
-    this.setClosePopupHandler(this._callback.closeClick);
+    this.setPopupCloseHandler(this._callback.closeClick);
     this.setMoviePopupWatchlistClickHandler(this._callback.watchlistClick);
     this.setMoviePopupWatchedClickHandler(this._callback.watchedClick);
     this.setMoviePopupFavoriteClickHandler(this._callback.favoriteClick);
-    this.setPopupDeleteCommentHandler(this._callback.deleteCommentClick);
-    this.setPopupAddCommentHandler(this._callback.addCommentClick);
+    this.setPopupCommentDeleteHandler(this._callback.deleteCommentClick);
+    this.setPopupCommentAddHandler(this._callback.addCommentClick);
     this.#setInnerHandlers();
   }
 
@@ -194,7 +194,7 @@ export default class PopupView extends SmartView {
     }
   }
 
-  setClosePopupHandler = (callback) => {
+  setPopupCloseHandler = (callback) => {
     this._callback.closeClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closePopupClickHandler);
   }
@@ -214,12 +214,12 @@ export default class PopupView extends SmartView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#movieFavoriteClickHandler);
   }
 
-  setPopupDeleteCommentHandler = (callback) => {
+  setPopupCommentDeleteHandler = (callback) => {
     this._callback.deleteCommentClick = callback;
-    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#deleteCommentHandler));
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#commentDeleteHandler));
   }
 
-  setPopupAddCommentHandler = (callback) => {
+  setPopupCommentAddHandler = (callback) => {
     this._callback.addCommentClick = callback;
     this.element.querySelector('.film-details__new-comment').addEventListener('keydown', this.#ctrlEnterKeyDownHandler);
   }
@@ -265,7 +265,7 @@ export default class PopupView extends SmartView {
     this.#newComment.comment = he.encode(evt.target.value);
   }
 
-  #deleteCommentHandler = (evt) => {
+  #commentDeleteHandler = (evt) => {
     evt.preventDefault();
     this.#deleteCommentId = evt.target.id;
     this._callback.deleteCommentClick(evt.target.id);

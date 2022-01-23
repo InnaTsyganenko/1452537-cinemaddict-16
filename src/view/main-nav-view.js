@@ -16,7 +16,7 @@ export default class MainNavView extends AbstractView {
 
   #menuClickHandler = (evt) => {
     evt.preventDefault();
-    document.querySelectorAll('[data-filter-type]').forEach((link) => link.classList.toggle('main-navigation__item--disabled'));
+    this.element.querySelectorAll('[data-filter-type]').forEach((link) => link.classList.toggle('main-navigation__item--disabled'));
     evt.target.classList.toggle('main-navigation__additional--active');
     this._callback.menuClick(evt.target.classList);
   }
