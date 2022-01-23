@@ -1,6 +1,8 @@
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class ApiService {
@@ -38,6 +40,27 @@ export default class ApiService {
 
     const parsedResponse = await ApiService.parseResponse(response);
     return parsedResponse;
+  }
+
+  addComment = async (movie) => {
+    const response = await this.#load({
+      url: `comments/${movie.id}`,
+      method: Method.POST,
+      body: JSON.stringify(movie.commentsData[0]),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+    return parsedResponse;
+  }
+
+  deleteComment = async (commentId) => {
+    const response = await this.#load({
+      url: `comments/${commentId}`,
+      method: Method.DELETE,
+    });
+
+    return response;
   }
 
   #load = async ({

@@ -1,10 +1,10 @@
 import AbstractView from './abstract-view.js';
 import dayjs from 'dayjs';
 import {formatRunTime} from '../utils/movie';
-import {CONTROLS_BUTTON} from '../const';
+import {controls} from '../const';
 
 const createPopupControlsTemplate = (movie) => (
-  CONTROLS_BUTTON.map((control) => `<button
+  controls.map((control) => `<button
     class="film-card__controls-item
     ${control === 'watchlist' ? `film-card__controls-item--add-to-${control}` : ''}
     ${control === 'watchlist' && movie.userDetails.isInWatchlist ? 'film-card__controls-item--active' : ''}

@@ -2,7 +2,7 @@ import SortView from '../view/sort-view';
 import MoviesSectionView from '../view/movies-section-view';
 import MoviesListView from '../view/movies-list-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
-import MoviePresenter from '../presenter/movie-presenter';
+import MoviePresenter, {State as MoviePresenterViewState} from '../presenter/movie-presenter';
 import ShowMoreButtonView from '../view/show-more-button-view';
 import LoadingView from '../view/loading-view.js';
 import NoMoviesView from '../view/no-movies-view';
@@ -19,6 +19,7 @@ export default class MoviesPresenter {
   #userInfoModel = null;
   #noMovieComponent = null;
   #showMoreButtonComponent = null;
+  #scrollPos = 0;
 
   #moviesSectionComponent = new MoviesSectionView();
   #moviesListComponent = new MoviesListView();
@@ -30,7 +31,7 @@ export default class MoviesPresenter {
   #isLoadingMovies = true;
 
   #renderedMovieCount = MOVIE_COUNT_PER_STEP;
-  #moviesMainPresenter = new Map();
+  #movieMainPresenter = new Map();
 
   constructor(mainContainer, footerContainer, moviesModel, filterModel, userInfoModel) {
     this.#mainContainer = mainContainer;
@@ -47,7 +48,7 @@ export default class MoviesPresenter {
     const filteredmovies = filter[this.#filterType](movies);
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return filteredmovies.sort((a, b) => b.filmInfo.release.date - a.filmInfo.release.date);
+        return filteredmovies.sort((a, b) => (new Date(b.filmInfo.release.date)) - (new Date(a.filmInfo.release.date)));
       case SortType.RATING:
         return filteredmovies.sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
       default:
@@ -67,7 +68,7 @@ export default class MoviesPresenter {
   }
 
   destroy = () => {
-    this.#clearMovieList({resetRenderedMovieCount: true});
+    this.#clearMovieList({resetRenderedMovieCount: true, resetSort: true});
     this.#moviesSectionComponent.element.remove();
     this.#removeSort();
 
@@ -75,27 +76,68 @@ export default class MoviesPresenter {
     this.#filterModel.removeObserver(this.#handleModelEvent);
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    if (this.#footerContainer.querySelector('.film-details')) {
+      this.#scrollPos = this.#footerContainer.querySelector('.film-details').scrollTop;
+    }
+
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
-        this.#moviesModel.updateMovie(updateType, update);
+        if (this.#footerContainer.querySelector('.film-details')) {
+          try {
+            await this.#moviesModel.updateMovieComments(updateType, update);
+          } catch(err) {
+            this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+          }
+        }
+        try {
+          await this.#moviesModel.updateMovie(updateType, update);
+        } catch(err) {
+          this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+        }
         break;
       case UserAction.GET_COMMENTS:
-        return this.#moviesModel.updateMovieComments(updateType, update);
+        this.#scrollPos = 0;
+        this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING);
+        try {
+          await this.#moviesModel.updateMovieComments(updateType, update);
+        } catch(err) {
+          this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+        }
+        break;
+      case UserAction.ADD_COMMENT:
+        this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.SAVING);
+        this.#scrollPos = this.#footerContainer.querySelector('.film-details').scrollHeight;
+        try {
+          await this.#moviesModel.addComment(updateType, update);
+        } catch(err) {
+          this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+        }
+        break;
+      case UserAction.DELETE_COMMENT:
+        this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.DELETING);
+        try {
+          await this.#moviesModel.deleteComment(updateType, update);
+        } catch(err) {
+          this.#movieMainPresenter.get(update.id).setViewState(MoviePresenterViewState.ABORTING);
+        }
+        break;
     }
   }
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#moviesMainPresenter.get(data.id).init(data);
+        this.#movieMainPresenter.get(data.id).init(data, this.#scrollPos);
         break;
       case UpdateType.MINOR:
         this.#clearMovieList();
         this.#renderMainBlockMovies();
+        if (this.#footerContainer.querySelector('.film-details') && this.#footerContainer.querySelector('.film-details').id === data.id) {
+          this.#movieMainPresenter.get(data.id).init(data, this.#scrollPos);
+        }
         break;
       case UpdateType.MAJOR:
-        this.#closeOpenedPopup();
         this.#clearMovieList({resetRenderedMovieCount: true, resetSort: true});
         this.#renderMainBlockMovies();
         break;
@@ -104,12 +146,6 @@ export default class MoviesPresenter {
         this.#loadingComponent.element.remove();
         this.#renderMoviesSection();
         break;
-    }
-  }
-
-  #closeOpenedPopup = () => {
-    if (this.#footerContainer.firstElementChild.classList.contains('film-details')) {
-      this.#footerContainer.querySelector('.film-details__close-btn').click();
     }
   }
 
@@ -152,7 +188,6 @@ export default class MoviesPresenter {
 
   #handleSortTypeChange = (sortType) => {
     this.#currentSortType = sortType;
-    this.#closeOpenedPopup();
     this.#clearMovieList({resetRenderedMovieCount: true});
     this.#renderMainBlockMovies();
   }
@@ -172,9 +207,9 @@ export default class MoviesPresenter {
   }
 
   #renderMovieCard = (container, movie) => {
-    const moviesMainPresenter = new MoviePresenter(container, this.#handleViewAction);
-    moviesMainPresenter.init(movie);
-    this.#moviesMainPresenter.set(movie.id, moviesMainPresenter);
+    const movieMainPresenter = new MoviePresenter(container, this.#handleViewAction, movie.id);
+    movieMainPresenter.init(movie);
+    this.#movieMainPresenter.set(movie.id, movieMainPresenter);
   }
 
   #renderShowMoreButton = () => {
@@ -220,6 +255,7 @@ export default class MoviesPresenter {
       this.#renderLoading();
       return;
     }
+
     this.#renderMainBlockMovies();
   }
 }
