@@ -59,6 +59,7 @@ export default class MoviePresenter {
     if (popupElement) {
       this.#scrollPos = popupElement.scrollTop;
     }
+
     const resetFormState = () => {
       if (this.#popupComponent) {
         this.#popupComponent.updateData({
@@ -174,14 +175,14 @@ export default class MoviePresenter {
   #handleCommentDeleteClick = (commentId) => {
     this.#changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, commentDel: commentId});
   }
 
   #handleCommentAddClick = (newComment) => {
     this.#changeData(
       UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie,
         commentsData: [newComment, ...this.#movie.commentsData],
         comments: [newComment.id, ...this.#movie.comments]

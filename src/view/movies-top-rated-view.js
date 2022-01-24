@@ -6,7 +6,7 @@ const createMoviesListTopRatedTemplate = () => (
   <div class="films-list__container"></div>
 </section>`
 );
-export default class MoviesListTopRatedView extends AbstractView {
+export default class MoviesTopRatedView extends AbstractView {
   get template() {
     return createMoviesListTopRatedTemplate();
   }
