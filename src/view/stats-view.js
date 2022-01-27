@@ -95,6 +95,7 @@ const createStatisticsTemplate = (userRank, userSrcImg, data, filterStats) => {
   const findTopGenre = (genres) => {
     let genreValues = Object.values(genres)[0];
     let genreKeys = Object.keys(genres)[0];
+
     for (const [key, value] of Object.entries(genres)) {
       if (value > genreValues){
         genreValues = value;

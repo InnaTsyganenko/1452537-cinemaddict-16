@@ -23,6 +23,8 @@ export default class MoviePresenter {
   constructor(moviesContainer, changeData) {
     this.#moviesContainer = moviesContainer;
     this.#changeData = changeData;
+
+    this.#footerContainer = document.querySelector('.footer');
   }
 
   init = (movie, scrollPos) => {
@@ -32,8 +34,6 @@ export default class MoviePresenter {
     const prevMovieCardComponent = this.#movieCardComponent;
 
     this.#movieCardComponent = new MovieCardView(movie);
-
-    this.#footerContainer = document.querySelector('.footer');
 
     this.#movieCardComponent.setMovieLinkClickHandler(this.#handleMovieLinkClick);
 
@@ -55,9 +55,11 @@ export default class MoviePresenter {
   }
 
   setViewState = (state) => {
-    if (document.querySelector('.film-details')) {
-      this.#scrollPos = document.querySelector('.film-details').scrollTop;
+    const popupElement = document.querySelector('.film-details');
+    if (popupElement) {
+      this.#scrollPos = popupElement.scrollTop;
     }
+
     const resetFormState = () => {
       if (this.#popupComponent) {
         this.#popupComponent.updateData({
@@ -102,7 +104,7 @@ export default class MoviePresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#handleClosePopupClick();
+      this.#handlePopupCloseClick();
     }
   }
 
@@ -117,12 +119,12 @@ export default class MoviePresenter {
 
     this.#popupComponent = new PopupView(this.#movie);
 
-    this.#popupComponent.setClosePopupHandler(this.#handleClosePopupClick);
+    this.#popupComponent.setPopupCloseHandler(this.#handlePopupCloseClick);
     this.#popupComponent.setMoviePopupWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setMoviePopupWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setMoviePopupFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#popupComponent.setPopupDeleteCommentHandler(this.#handleDeleteCommentClick);
-    this.#popupComponent.setPopupAddCommentHandler(this.#handleAddCommentClick);
+    this.#popupComponent.setPopupCommentDeleteHandler(this.#handleCommentDeleteClick);
+    this.#popupComponent.setPopupCommentAddHandler(this.#handleCommentAddClick);
 
     render(this.#footerContainer, this.#popupComponent.element, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -130,7 +132,7 @@ export default class MoviePresenter {
     this.#popupComponent.element.scroll(0, this.#scrollPos);
   }
 
-  #handleClosePopupClick = () => {
+  #handlePopupCloseClick = () => {
     this.#popupComponent.element.remove();
     document.querySelector('body').classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -170,17 +172,17 @@ export default class MoviePresenter {
     );
   }
 
-  #handleDeleteCommentClick = (commentId) => {
+  #handleCommentDeleteClick = (commentId) => {
     this.#changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, commentDel: commentId});
   }
 
-  #handleAddCommentClick = (newComment) => {
+  #handleCommentAddClick = (newComment) => {
     this.#changeData(
       UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie,
         commentsData: [newComment, ...this.#movie.commentsData],
         comments: [newComment.id, ...this.#movie.comments]

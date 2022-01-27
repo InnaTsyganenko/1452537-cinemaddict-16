@@ -1,6 +1,5 @@
 export const MOVIE_COUNT_PER_STEP = 5;
 export const emotions = ['smile', 'sleeping', 'puke','angry'];
-
 export const controls = ['watchlist', 'watched', 'favorite'];
 
 export const FilterType = {

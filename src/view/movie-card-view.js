@@ -22,7 +22,7 @@ const createPopupControlsTemplate = (movie) => (
 const createMovieCardTemplate = (movie) => {
   const controlsTemplate = createPopupControlsTemplate(movie);
 
-  return`<article class="film-card" id=${movie.id}>
+  return `<article class="film-card" id=${movie.id}>
     <a class="film-card__link">
       <h3 class="film-card__title">${movie.filmInfo.title}</h3>
       <p class="film-card__rating">${movie.filmInfo.totalRating}</p>
