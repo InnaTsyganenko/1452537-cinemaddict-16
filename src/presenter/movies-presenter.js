@@ -285,9 +285,8 @@ export default class MoviesPresenter {
     }
 
     this.#renderMainBlockMovies();
-
-    const isAllMovieRatingNull = [...this.#moviesModel.movies].every((movie) => movie.filmInfo.totalRating !== 0);
-    const isAllMovieNoComments = [...this.#moviesModel.movies].every((movie) => movie.comments.length !== 0);
+    const isAllMovieRatingNull = [...this.#moviesModel.movies].some((movie) => movie.filmInfo.totalRating !== 0);
+    const isAllMovieNoComments = [...this.#moviesModel.movies].some((movie) => movie.comments.length !== 0);
 
     if (isAllMovieRatingNull) {
       this.#renderTopRatedBlockMovies(this.#moviesTopRated);

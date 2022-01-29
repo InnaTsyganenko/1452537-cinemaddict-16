@@ -14,21 +14,21 @@ const renderStatsChart = (moviesByGenreCtx, data) => {
   const uniqGenre = [...new Set(allGenre)].length;
   moviesByGenreCtx.height = BAR_HEIGHT * uniqGenre;
 
-  const countGenre = JSON.stringify(
+  const countGenres = JSON.stringify(
     allGenre.reduce((acc, el) => {
       acc[el] = (acc[el] || 0) + 1;
       return acc;
     }, {}), null, 2);
 
-  const sortingByCount = Object.entries(JSON.parse(countGenre)).sort((a, b) => b[1] - a[1]);
+  const sortingByCount = Object.entries(JSON.parse(countGenres)).sort((a, b) => b[1] - a[1]);
 
   return new Chart(moviesByGenreCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: Array.from(sortingByCount.map((arr) => arr[0])),
+      labels: Array.from(sortingByCount.map((item) => item[0])),
       datasets: [{
-        data: Array.from(sortingByCount.map((arr) => arr[1])),
+        data: Array.from(sortingByCount.map((item) => item[1])),
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
         anchor: 'start',
@@ -86,7 +86,7 @@ const createStatisticsTemplate = (userRank, userSrcImg, data, filterStats) => {
   const commonDuration = movies.reduce((a, b) => a + b.filmInfo.runtime, 0);
   const allGenre = movies.map((movie) => movie.filmInfo.genres).flat();
 
-  const countGenre = JSON.stringify(
+  const countGenres = JSON.stringify(
     allGenre.reduce((acc, el) => {
       acc[el] = (acc[el] || 0) + 1;
       return acc;
@@ -130,7 +130,7 @@ const createStatisticsTemplate = (userRank, userSrcImg, data, filterStats) => {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">${findTopGenre(JSON.parse(countGenre)) === undefined ? '' : findTopGenre(JSON.parse(countGenre))}</p>
+      <p class="statistic__item-text">${findTopGenre(JSON.parse(countGenres)) === undefined ? '' : findTopGenre(JSON.parse(countGenres))}</p>
     </li>
   </ul>
 
