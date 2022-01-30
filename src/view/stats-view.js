@@ -26,9 +26,9 @@ const renderStatsChart = (moviesByGenreCtx, data) => {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: Array.from(sortingByCount.map((item) => item[0])),
+      labels: Array.from(sortingByCount.map((items) => items[0])),
       datasets: [{
-        data: Array.from(sortingByCount.map((item) => item[1])),
+        data: Array.from(sortingByCount.map((items) => items[1])),
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
         anchor: 'start',
